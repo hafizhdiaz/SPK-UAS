@@ -2,42 +2,46 @@
 
 <?php 
 error_reporting(0);
-if (isset($_POST['proses'])) {
-  // mengambil hasil inputan
-  $nim = $_POST['inp_nim'];
-  $id_nama = $_POST['inp_nama'];
-  $alamat = $_POST['inp_alamat'];
+// mengambil hasil inputan
 
-  // insert ke dalam tabel history
-  $connect->query("INSERT INTO tb_history (nim, alamat, id_nama) VALUES ('$nim', '$alamat', '$id_nama')");
+$id_history = $_GET['id_history'];
+$get_data = "SELECT tb_history.*, tb_nama.nama_mhs FROM tb_history INNER JOIN tb_nama ON tb_history.id_nama = tb_nama.id_nama WHERE id_history = '$id_history' ";
+$q_data   = $connect->query($get_data);
+$s_data   = $q_data->fetch_array(MYSQLI_ASSOC);
 
-  $sql2 = "SELECT * FROM tb_alternatif";
-  $result2 = $connect->query($sql2);
+$nim = $s_data['nim'];
+$nma_mhs     = $s_data['nama_mhs'];
+$id_nama      = $s_data['id_nama'];
+$alamat         = $s_data['alamat'];
 
-  $sql3 = "SELECT id_criteria, criteria FROM tb_kriteria";
-  $result3 = $connect->query($sql3);
 
-  $motor = array();
-  $alternatif = array();
+$sql2 = "SELECT * FROM tb_alternatif";
+$result2 = $connect->query($sql2);
 
-  while($row = $result2->fetch_row()){
-    $motor[$row[0]] = $row[0];
-    $alternatif[$row[0]]=array($row[1]);
-  }
+$sql3 = "SELECT id_criteria, criteria FROM tb_kriteria";
+$result3 = $connect->query($sql3);
 
-  $query4   = $connect->query("SELECT * FROM tb_kriteria_nama WHERE id_nama = '$id_nama'");
-  $row      = $query4->fetch_array(MYSQLI_ASSOC);
-  $kriteria = json_decode($row['kriteria'], true);
+$motor = array();
+$alternatif = array();
 
-  $array_kriteria = array(
-    ['id_kriteria' => $kriteria[0]['id_kriteria'], 'kriteria' => $kriteria[0]['kriteria'], 'weight' => $kriteria[0]['weight']],
-    ['id_kriteria' => $kriteria[1]['id_kriteria'], 'kriteria' => $kriteria[1]['kriteria'], 'weight' => $kriteria[1]['weight']],
-    ['id_kriteria' => $kriteria[2]['id_kriteria'], 'kriteria' => $kriteria[2]['kriteria'], 'weight' => $kriteria[2]['weight']],
-    ['id_kriteria' => $kriteria[3]['id_kriteria'], 'kriteria' => $kriteria[3]['kriteria'], 'weight' => $kriteria[3]['weight']],
-  );
-  $data_kriteria = json_encode($array_kriteria);
-  $connect->query("UPDATE tb_kriteria_nama SET kriteria = '$data_kriteria' WHERE id_nama = '$id_nama'");
+while($row = $result2->fetch_row()){
+  $motor[$row[0]] = $row[0];
+  $alternatif[$row[0]]=array($row[1]);
 }
+
+
+$query4   = $connect->query("SELECT * FROM tb_kriteria_nama WHERE id_nama = '$id_nama'");
+$row      = $query4->fetch_array(MYSQLI_ASSOC);
+$kriteria = json_decode($row['kriteria'], true);
+
+$array_kriteria = array(
+  ['id_kriteria' => $kriteria[0]['id_kriteria'], 'kriteria' => $kriteria[0]['kriteria'], 'weight' => $kriteria[0]['weight']],
+  ['id_kriteria' => $kriteria[1]['id_kriteria'], 'kriteria' => $kriteria[1]['kriteria'], 'weight' => $kriteria[1]['weight']],
+  ['id_kriteria' => $kriteria[2]['id_kriteria'], 'kriteria' => $kriteria[2]['kriteria'], 'weight' => $kriteria[2]['weight']],
+  ['id_kriteria' => $kriteria[3]['id_kriteria'], 'kriteria' => $kriteria[3]['kriteria'], 'weight' => $kriteria[3]['weight']],
+);
+$data_kriteria = json_encode($array_kriteria);
+$connect->query("UPDATE tb_kriteria_nama SET kriteria = '$data_kriteria' WHERE id_nama = '$id_nama'");
 ?>
 
 <!DOCTYPE html>
@@ -75,29 +79,41 @@ if (isset($_POST['proses'])) {
     </div>
 
     <header class="site-navbar py-4 js-sticky-header site-navbar-target" style="background-color: #4baea0" role="banner">
+
       <div class="container-fluid">
         <div class="d-flex align-items-center">
-          <div class="site-logo mr-auto w-25" style="color: #fff; padding-top: 10px"><a href="index.php">SPK ELECTRE MOTOR</div>
+          <div class="site-logo mr-auto w-25"><a href="index.php">SPK ELECTRE MOTOR</a></div>
 
           <div class="mx-auto text-center">
             <nav class="site-navigation position-relative text-right" role="navigation">
-              <ul class="site-menu main-menu js-clone-nav mx-auto d-none d-lg-block  m-0 p-0">
-                <li><a href="konsul.php" class="nav-link">Konsul</a></li>
-                <li><a href="history.php" class="nav-link">History</a></li>
+              <ul class="site-menu main-menu js-clone-nav mx-auto d-none d-lg-block m-0 p-0">
+                <li>
+                  <a href="index.php" class="nav-link">Beranda</a>
+                </li>
+                <li>
+                  <a href="konsul.php" class="nav-link">Konsul</a>
+                </li>
+                <li>
+                  <a href="history.php" class="nav-link">History</a>
+                </li>
               </ul>
             </nav>
           </div>
 
-          <div class="ml-auto w-25"></div>
+          <div class="ml-auto w-25">
+            <a href="#" class="d-inline-block d-lg-none site-menu-toggle js-menu-toggle text-black float-right"><span class="icon-menu h3"></span></a>
+          </div>
         </div>
       </div>
+      
     </header>
+
 
     <div class="site-section">
       <div class="container">
         <div class="row mt-5 justify-content-center">
           <div class="col-lg-12">
-            <h3 class="text-center" style="color: #000">Hasil Perhitungan</h3>
+            <h3 class="text-center" style="color: #000">Detail History</h3>
             
             <div class="card">
               <div class="card-header">
@@ -107,11 +123,49 @@ if (isset($_POST['proses'])) {
 
                 <ul class="nav nav-tabs" id="myTab" role="tablist">
                   <li class="nav-item">
-                    <a class="nav-link active" id="home-tab" data-toggle="tab" href="#home" role="tab" aria-controls="home" aria-selected="true">Proses Metode Electre</a>
+                    <a class="nav-link active" id="profil-tab" data-toggle="tab" href="#profil" role="tab" aria-controls="profil" aria-selected="true">Profil</a>
+                  </li>
+                  <li class="nav-item">
+                    <a class="nav-link" id="home-tab" data-toggle="tab" href="#home" role="tab" aria-controls="home" aria-selected="false">Proses Metode Electre</a>
                   </li>
                 </ul>
                 <div class="tab-content" id="myTabContent">
-                  <div class="tab-pane fade show active" id="home" role="tabpanel" aria-labelledby="home-tab">
+
+                  <div class="tab-pane fade show active" id="profil" role="tabpanel" aria-labelledby="profil-tab">
+                    
+                    <br>
+
+                    <div class="card">
+                      <div class="card-header">
+                        Detail Pengunjung
+                      </div>
+                      <div class="card-body">
+                        <form action="konsul_proses.php" method="post">
+                          <div class="form-group row">
+                            <label class="col-sm-3 col-form-label">NIM</label>
+                            <div class="col-sm-9">
+                              <?= $nim ?>
+                            </div>
+                          </div>
+                          <div class="form-group row">
+                            <label class="col-sm-3 col-form-label">Nama Mahasiswa</label>
+                            <div class="col-sm-9">
+                              <?= $nma_mhs ?>
+                            </div>
+                          </div>
+                          <div class="form-group row">
+                            <label class="col-sm-3 col-form-label">Alamat</label>
+                            <div class="col-sm-9">
+                              <?= $alamat ?>
+                            </div>
+                          </div>
+                        </form>
+                      </div>
+                    </div>
+
+                  </div>
+
+                  <div class="tab-pane fade show" id="home" role="tabpanel" aria-labelledby="home-tab">
 
                    <div class="row">
                     <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
@@ -270,7 +324,9 @@ if (isset($_POST['proses'])) {
                                 echo "<td>".$criteria[$i]."</td>";
                               }
                               echo "</tr>";
-                              
+
+
+
                               ?>
                             </tbody>
                           </table>
@@ -393,7 +449,7 @@ if (isset($_POST['proses'])) {
             <div class="row">
               <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
                 <div class="card">
-                  <div class="header">
+                  <div class="card-header">
                     Menentukan Discordance Index (Dkl)
                   </div>
                   <div class="body table-responsive">
@@ -452,7 +508,7 @@ if (isset($_POST['proses'])) {
           <div class="row">
             <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
               <div class="card">
-                <div class="header">
+                <div class="card-header">
                   Membentuk Matriks Concordance (C)
                 </div>
                 <div class="body table-responsive">
@@ -510,7 +566,7 @@ if (isset($_POST['proses'])) {
           <div class="row">
             <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
               <div class="card">
-                <div class="header">
+                <div class="card-header">
                   Threshold c
                 </div>
                 <div class="body table-responsive">
@@ -534,7 +590,7 @@ if (isset($_POST['proses'])) {
           <div class="row">
             <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
               <div class="card">
-                <div class="header">
+                <div class="card-header">
                   Membentuk Matriks Discordance (D)
                 </div>
                 <div class="body table-responsive">
@@ -602,7 +658,7 @@ if (isset($_POST['proses'])) {
         <div class="row">
           <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
             <div class="card">
-              <div class="header">
+              <div class="card-header">
                 Threshold d
               </div>
               <div class="body table-responsive">
@@ -626,7 +682,7 @@ if (isset($_POST['proses'])) {
         <div class="row ">
           <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
             <div class="card">
-              <div class="header">
+              <div class="card-header">
                 Membentuk Matrik Concordance Dominan(F)
               </div>
               <div class="body table-responsive">
@@ -672,7 +728,7 @@ if (isset($_POST['proses'])) {
       <div class="row ">
         <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
           <div class="card">
-            <div class="header">
+            <div class="card-header">
               Membentuk Matrik Discordance Dominan(G)
             </div>
             <div class="body table-responsive">
@@ -718,7 +774,7 @@ if (isset($_POST['proses'])) {
   <div class="row ">
     <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
       <div class="card">
-        <div class="header">
+        <div class="card-header">
           Membentuk Matrik Agregasi Dominan(E)
         </div>
         <div class="body table-responsive">
@@ -769,7 +825,7 @@ if (isset($_POST['proses'])) {
 <div class="row ">
   <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
     <div class="card">
-      <div class="header">
+      <div class="card-header">
         Ranking Motor
       </div>
       <div class="body table-responsive">
@@ -802,45 +858,22 @@ if (isset($_POST['proses'])) {
 </div>
 
 </div>
-<?php 
-
-if (isset($_POST['proses'])) {
-  $hasil_akhir1 = json_encode($hasil1);
-  $hasil_akhir2 = json_encode($hasil2);
-
-  $sql    = "SELECT * FROM tb_ranking WHERE id_nama = '$id_nama' ";
-  $tambah = mysqli_query($connect, $sql);
-
-  if ($row = mysqli_fetch_row($tambah)) {
-
-    $sql   = "DELETE FROM tb_ranking WHERE id_nama = '$id_nama'";
-    $query = mysqli_query($connect, $sql);
-    $sql2 = "INSERT INTO tb_ranking (id_nama, hasil_electre) VALUES ('$id_nama', '$hasil_akhir1', '$hasil_akhir2')";
-    $query = mysqli_query($connect, $sql2);
-
-  } else {
-
-    $sql = "INSERT INTO tb_ranking (id_nama, hasil_electre) VALUES ('$id_nama', '$hasil_akhir1', '$hasil_akhir2')";
-    $query = $connect->query($sql);
-  }
-}
-?>
 
 </div> <!-- .site-wrap -->
 
-<script src="assets/js/jquery-3.3.1.min.js"></script>
-<script src="assets/js/jquery-ui.js"></script>
-<script src="assets/js/popper.min.js"></script>
-<script src="assets/js/bootstrap.min.js"></script>
-<script src="assets/js/owl.carousel.min.js"></script>
-<script src="assets/js/jquery.stellar.min.js"></script>
-<script src="assets/js/jquery.countdown.min.js"></script>
-<script src="assets/js/bootstrap-datepicker.min.js"></script>
-<script src="assets/js/jquery.easing.1.3.js"></script>
-<script src="assets/js/aos.js"></script>
-<script src="assets/js/jquery.fancybox.min.js"></script>
-<script src="assets/js/jquery.sticky.js"></script>
-<script src="assets/js/main.js"></script>
+ <script src="assets/js/jquery-3.3.1.min.js"></script>
+  <script src="assets/js/jquery-ui.js"></script>
+  <script src="assets/js/popper.min.js"></script>
+  <script src="assets/js/bootstrap.min.js"></script>
+  <script src="assets/js/owl.carousel.min.js"></script>
+  <script src="assets/js/jquery.stellar.min.js"></script>
+  <script src="assets/js/jquery.countdown.min.js"></script>
+  <script src="assets/js/bootstrap-datepicker.min.js"></script>
+  <script src="assets/js/jquery.easing.1.3.js"></script>
+  <script src="assets/js/aos.js"></script>
+  <script src="assets/js/jquery.fancybox.min.js"></script>
+  <script src="assets/js/jquery.sticky.js"></script>
+  <script src="assets/js/main.js"></script>
 
 </body>
 </html>

@@ -86,35 +86,22 @@
                   <div class="form-group row">
                     <label class="col-sm-2 col-form-label">NIM</label>
                     <div class="col-sm-10">
-                      <input type="text" name="inp_nama_pengujung" class="form-control" placeholder="Masukkan NIM Anda">
+                      <input type="text" name="inp_nim" class="form-control" placeholder="Masukkan NIM Anda">
                     </div>
                   </div>
                   <div class="form-group row">
                     <label class="col-sm-2 col-form-label">Nama</label>
                     <div class="col-sm-10">
-                      <select class="custom-select" name="inp_lokasi">
+                      <select class="custom-select" name="inp_nama">
                         <option selected>Pilih Nama Anda</option>
-                        <?php $tanaman = $connect->query("SELECT * FROM tb_lokasi"); while ($row = $tanaman->fetch_array(MYSQLI_ASSOC)) { ?>
-                          <option value="<?= $row['id_lokasi'] ?>"><?= $row['nama_lokasi']; ?></option>
+                        <?php $motor = $connect->query("SELECT * FROM tb_nama"); while ($row = $motor->fetch_array(MYSQLI_ASSOC)) { ?>
+                          <option value="<?= $row['id_nama'] ?>"><?= $row['nama_mhs']; ?></option>
+                          <!-- <option value="<?= $row['nama_mhs'] ?>"><?= $row['nama_mhs']; ?></option> -->
                         <?php } ?>
                       </select>
                     </div>
                   </div>
-                  <!-- <div class="form-group row">
-                    <label class="col-sm-2 col-form-label">Bulan</label>
-                    <div class="col-sm-10">
-                      <select class="custom-select" name="inp_bulan">
-                        <option selected>Pilih Bulan</option>
-                        <?php 
-                        $query    = $connect->query("SELECT * FROM tb_kriteria WHERE id_criteria = '2'"); 
-                        $row      = $query->fetch_array(MYSQLI_ASSOC);
-                        $kriteria = json_decode($row['bulan'], true);
-                        for ($i = 0; $i < count($kriteria); $i++) { ?>
-                          <option value="<?= $kriteria[$i]['id_bulan'] ?>"><?= $kriteria[$i]['bulan'] ?></option>
-                        <?php } ?>
-                      </select>
-                    </div>
-                  </div> -->
+        
                   <div class="form-group row">
                     <label class="col-sm-2 col-form-label">Alamat</label>
                     <div class="col-sm-10">

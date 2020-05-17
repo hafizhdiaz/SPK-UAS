@@ -1,41 +1,4 @@
-<?php
-// untuk koneksi ke database
-include_once 'database/koneksi.php';
-session_start();
-
-if(isset($_POST["masuk"])) {
-
-  $user = $_POST['inpusername'];
-  $pass = $_POST['inppassword'];
-
-  $sql    = "SELECT * FROM tb_user WHERE username = '$user'";
-  $result = $connect->query($sql);
-    // cek username
-  if ($result->num_rows > 0) {
-
-        // cek password
-    $row = $result->fetch_array(MYSQLI_ASSOC);
-    // untuk mengecek username
-    if ($row['username'] == $user) {
-            // untuk mengecek password
-      if (password_verify($pass, $row["password"])) {
-                // untuk mengecek level user
-        if ($row['level'] == 'admin') {
-                  // set session
-          $_SESSION["inpusername"] = $user;
-          $_SESSION["level"]       = 'admin';
-          header("location: admin/index.php");
-          exit;
-        }
-      } else {
-        $inppassword = true;
-      }
-    }
-  } else {
-    $inpuserornpm = true;
-  }
-}
-?>
+<?php include_once 'database/koneksi.php'; ?>
 
 <!DOCTYPE html>
 <html lang="en">
@@ -46,8 +9,7 @@ if(isset($_POST["masuk"])) {
 
   <link href="https://fonts.googleapis.com/css?family=Muli:300,400,700,900" rel="stylesheet">
   <link rel="stylesheet" href="assets/fonts/icomoon/style.css">
-
-  <link rel="stylesheet" href="assets/css/bootstrap.min.css">
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
   <link rel="stylesheet" href="assets/css/jquery-ui.css">
   <link rel="stylesheet" href="assets/css/owl.carousel.min.css">
   <link rel="stylesheet" href="assets/css/owl.theme.default.min.css">
@@ -61,7 +23,6 @@ if(isset($_POST["masuk"])) {
 </head>
 <body data-spy="scroll" data-target=".site-navbar-target" data-offset="300">
 
-   
   <div class="site-wrap">
 
     <div class="site-mobile-menu site-navbar-target">
@@ -72,48 +33,84 @@ if(isset($_POST["masuk"])) {
       </div>
       <div class="site-mobile-menu-body"></div>
     </div>
-   
-    
-    <header class="site-navbar py-4 js-sticky-header site-navbar-target" role="banner">
+
+    <header class="site-navbar py-4 js-sticky-header site-navbar-target" style="background-color: #4baea0" role="banner">
+
       <div class="container-fluid">
         <div class="d-flex align-items-center">
           <div class="site-logo mr-auto w-25"><a href="index.php">SPK ELECTRE MOTOR</a></div>
 
           <div class="mx-auto text-center">
             <nav class="site-navigation position-relative text-right" role="navigation">
-              <ul class="site-menu main-menu js-clone-nav mx-auto d-none d-lg-block  m-0 p-0">
-                <li><a href="index.php" class="nav-link">Beranda</a></li>
-                <li><a href="konsul.php" class="nav-link">Konsul</a></li>
-                <li><a href="history.php" class="nav-link">History</a></li>
+              <ul class="site-menu main-menu js-clone-nav mx-auto d-none d-lg-block m-0 p-0">
+                <li>
+                  <a href="index.php" class="nav-link">Beranda</a>
+                </li>
+                <li>
+                  <a href="konsul.php" class="nav-link">Konsul</a>
+                </li>
+                <li>
+                  <a href="history.php" class="nav-link">History</a>
+                </li>
               </ul>
             </nav>
           </div>
-          
+
           <div class="ml-auto w-25">
             <a href="#" class="d-inline-block d-lg-none site-menu-toggle js-menu-toggle text-black float-right"><span class="icon-menu h3"></span></a>
           </div>
         </div>
       </div>
+      
     </header>
 
-    <div class="intro-section" id="home-section">
-      
-      <div class="slide-1" style="background-image: url('assets/images/vespa_1.jpg');" data-stellar-background-ratio="0.5">
-        <div class="container">
-          <div class="row align-items-center">
-            <div class="col-12">
-              <div class="row align-items-center">
-                <div class="col-lg-7">
-                  <h1  data-aos="fade-up" data-aos-delay="100">RUSTY MOTORCYCLES</h1>
-                  <p class="mb-4"  data-aos="fade-up" data-aos-delay="200">Cari rekomendasi motormu disini!</p>
-                  <p data-aos="fade-up" data-aos-delay="300"><a href="konsul.php" class="btn btn-primary py-3 px-5 btn-pill">Konsultasikan Sekarang!</a></p>
+    <div class="site-section">
+      <div class="container">
+        <div class="row mt-5 justify-content-center">
+          <div class="col-lg-12">
+            <h3 class="text-center" style="color: #000">History Perhitungan</h3>
+            
+            <div class="card">
+              <div class="card-header">
+                Data History
+              </div>
+              <div class="card-body">
+                <div class="table-responsive">
+                  <table class="table">
+                    <thead>
+                      <tr>
+                        <th>No</th>
+                        <th>NIM</th>
+                        <th>Tanggal Akses</th>
+                        <th>Nama</th>
+                        <th>Alamat</th>
+                        <th>Aksi</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <?php $data = $connect->query('SELECT tb_history.*, tb_nama.nama_mhs FROM tb_history INNER JOIN tb_nama ON tb_history.id_nama = tb_nama.id_nama ORDER BY id_history'); while ($row = $data->fetch_array(MYSQLI_ASSOC)) { ?>
+                        <tr>
+                          <td><?= $row['id_history'] ?></td>
+                          <td><?= $row['nim'] ?></td>
+                          <td><?= $row['tgl_akses'] ?></td>
+                          <td><?= $row['nama_mhs'] ?></td>
+                          <td><?= $row['alamat'] ?></td>
+                          <td>
+                            <a href="history_detail.php?id_history=<?= $row['id_history'] ?>">Detail</a>
+                          </td>
+                        </tr>
+                      <?php } ?>
+                    </tbody>
+                  </table>
                 </div>
               </div>
             </div>
+
           </div>
         </div>
       </div>
-    </div>  
+    </div>
+
     
   </div> <!-- .site-wrap -->
 
